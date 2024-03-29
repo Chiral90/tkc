@@ -1,0 +1,10 @@
+{
+    "dozos" : {
+        "champ_name":"정",
+        "champ_type":1
+    },
+    "dozosos" : {
+        "champ_name":"역",
+        "champ_type":2
+    }
+}
