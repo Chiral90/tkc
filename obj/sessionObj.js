@@ -5,7 +5,7 @@ const champion = require('./champion');
 const maxAge = 1000 * 6 * 5;
 
 const sessionObj = {
-    champ: new champion("조조",1),
+    champ: new champion(),
     secret: process.env.COOKIE_SECRET,
     resave: false,
     saveUninitialized: true,
