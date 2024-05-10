@@ -24,6 +24,7 @@
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.7",
     "nunjucks": "^3.2.4",
     "session-file-store": "^1.5.0"
   },
