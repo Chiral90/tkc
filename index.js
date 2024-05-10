@@ -10,7 +10,7 @@ const app = express()
 const port = process.env.PORT;
 const bodyParser = require("body-parser");
 
-const sessionObj = require('./obj/sessionObj');
+//const sessionObj = require('./obj/sessionObj');
 const champRouter = require('./routes/champ');
 const buildingRouter = require('./routes/building');
 const sqlRouter = require('./routes/sqlConnector');
