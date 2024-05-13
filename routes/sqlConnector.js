@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../middleware/dbConfig');
+const building = require('../obj/building');
 const router = express.Router();
 
 // const mysql = require('mysql2');
@@ -12,7 +13,6 @@ const router = express.Router();
 // });
 
 router.get('/', (req, res) => {
-    //
     conn.connect(); // mysql과 연결
 
     // var sql = `CREATE TABLE USERS_INFO
@@ -59,6 +59,12 @@ router.get('/', (req, res) => {
     //     leader VARCHAR(20) NOT NULL
     // ) ENGINE=INNODB;`
 
+    // var sql = `SELECT USERS_INFO.champ_name, USERS_INFO.champ_type, USERS_INFO.team, USERS_INFO.leadership, USERS_INFO.location
+    //             FROM BUILDINGS_STATIONED_INFO
+    //             LEFT JOIN USERS_INFO on BUILDINGS_STATIONED_INFO.stationed = USERS_INFO.champ_name
+    //             WHERE BUILDINGS_STATIONED_INFO.building_name = 'castle1'`
+    // var sql = 'select * from BUILDINGS_STATIONED_INFO where building_name = \'castle1\';';
+    var sql = 'select * from USERS_INFO;';
     conn.query(sql, function(err, rows, fields)
     {
         if (err) {
@@ -74,24 +80,45 @@ router.get('/', (req, res) => {
 router.get('/building/:name', async (req, res) => {
     var name = req.params.name;
     var building_data;
-    var stationed_data = [];
+    var stationed = {};
     try {
         const connection = await pool.getConnection();
         const sql = `SELECT building_name, castellan, team, building_type, population, food, morale
                     FROM BUILDINGS_INFO
                     WHERE building_name = '${name}'`;
         const [rows] = await connection.query(sql);
-        building_data = rows;
-        var sql2 = `SELECT stationed FROM BUILDINGS_STATIONED_INFO WHERE building_name = '${name}'`
+        building_data = rows[0];
+        var sql2 = `SELECT USERS_INFO.champ_name, USERS_INFO.champ_type, USERS_INFO.team, USERS_INFO.leadership, USERS_INFO.location
+                    FROM BUILDINGS_STATIONED_INFO
+                    LEFT JOIN USERS_INFO on BUILDINGS_STATIONED_INFO.stationed = USERS_INFO.champ_name
+                    WHERE BUILDINGS_STATIONED_INFO.building_name = '${name}'`
         const [rows2] = await connection.query(sql2);
-        
+        var idx = 0;
         rows2.forEach(element => {
-            stationed_data.push(element.stationed);
+            console.log(element);
+            stationed[idx] = {
+                champ_name: element.champ_name,
+                champ_type: element.champ_type,
+                team: element.team,
+                leadership: element.leadership,
+                own_castles: '',
+                location: element.location
+            }
+            idx++;
         });
         // building_data = JSON.stringify(rows).replace('[', '').replace(']', '').replace('{', '').replace('}', '');
         // stationed_data = JSON.stringify(stationed_data).replace('[', '').replace(']', '').replace('{', '').replace('}', '');
-        // var result = '{' + building_data + ',"stationed":[' + stationed_data + ']}';
-        var result = {building_data, stationed_data: '{' + stationed_data + '}'};
+        // var result = '{ ' + building_data + ',"stationed": "' + stationed_data + '" }';
+        var result = {
+            building_name: building_data.building_name,
+            castellan: building_data.castellan,
+            team: building_data.team,
+            building_type: building_data.building_type,
+            population: building_data.population,
+            food: building_data.food,
+            morale: building_data.morale,
+            stationed: stationed
+        };
         console.log((result));
         res.json(result);
         connection.release();
