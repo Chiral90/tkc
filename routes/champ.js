@@ -2,7 +2,8 @@ const express = require('express');
 const session = require('express-session')
 const router = express.Router();
 const champion = require('../obj/champion');
-const pool = require('../middleware/dbConfig')
+const pool = require('../middleware/dbConfig');
+const { getChampionInfo, createChampionInfo } = require('../functions/champ');
 
 router.get('/', async (req, res) => {
     //
@@ -78,60 +79,10 @@ router.post('/create', async (req, res) => {
     const result = await createChampionInfo(champ);
     console.log("created new user... / ", result);
     res.status(201).send("created new user...");
-    // try {
-    //     console.log('create');
-    //     const name = req.body.champ_name;
-    //     const type = req.body.champ_type;
-    //     const leadership = req.body.leadership;
-    //     const team = req.body.team;
-    //     const id = req.cookies.id;
-    //     const champion = new champion(id, name, type, leadership, team);
-    //     console.log('id: ', id, ' champion: ', champion);
-    //     const result = await createChampionInfo(champion);
-    //     console.log("created new user... / ", result);
-    //     res.status(201).send("created new user...");
-    // } catch (err) {
-    //     console.log(err.data);
-    //     res.status(404).send("create new user fail...");
-    // }
 });
 
 router.put('/', (req, res) => {
 
 });
-async function getChampionInfo(id)
-{
-    try {
-        const connection = await pool.getConnection();
-        const sql = `SELECT user_id, champ_name, champ_type, leadership, team, location
-                    FROM USERS_INFO WHERE user_id = '${id}'`;
-        const result = await connection.query(sql);
-        connection.release();
-        return result[0];
-    } catch (err) {
-        console.log(err);
-    }
-}
-async function createChampionInfo(c)
-{
-    try {
-        console.log(`${c.user_id} / ${c.champ_name}`);
-        const connection = await pool.getConnection();
-        const sql = `INSERT INTO USERS_INFO (user_id, champ_name, champ_type, leadership, team)
-                    VALUES ('${c.user_id}', '${c.champ_name}', '${c.champ_type}', '${c.leadership}', '${c.team}')`;
-        const result = await connection.query(sql);
-        connection.release();
-        return result[0];
-        // ResultSetHeader {
-        // fieldCount: 0,
-        // affectedRows: 1,
-        // insertId: 1,
-        // info: '',
-        // serverStatus: 2,
-        // warningStatus: 0,
-        // changedRows: 0 }
-    } catch (err) {
-        console.log(err);
-    }
-}
+
 module.exports = router;

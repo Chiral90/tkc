@@ -13,7 +13,7 @@ const bodyParser = require("body-parser");
 //const sessionObj = require('./obj/sessionObj');
 const champRouter = require('./routes/champ');
 const buildingRouter = require('./routes/building');
-const sqlRouter = require('./routes/sqlConnector');
+const { getRound } = require('./functions/turnInfo');
 
 //app.use(cors({
 //    origin: true,
@@ -23,14 +23,14 @@ app.set('view engine', 'html');
 nunjucks.configure('view', {
     express: app,
     watch: true,
-})
+});
 app.use(cookieParser(process.env.COOKIE_SECRET))
 //app.use(session(sessionObj))
 app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/', (req, res) => {
     console.log('get / ');
     res.json({Turn: 0, ServerTime: new Date(Date.now())});
-})
+});
 app.get('/root', (req, res) => {
     //존재하는 id이면 진행
     try {
@@ -76,4 +76,33 @@ app.listen(port, () => {
 app.use('/champ', champRouter);
 //app.use('/building', (req, res, next) => verifyToken(req, res, next), buildingRouter);
 app.use('/building', buildingRouter);
-app.use('/sql', sqlRouter);
+
+app.get('/getRound', async (req, res) => {
+    var queryResult = getRound();
+    var round = queryResult.round;
+    var turn = queryResult.turn;
+    var startTime = queryResult.start_time;
+    console.log('current round : ', round, ' / turn : ', turn, ' / start time : ', startTime);
+});
+
+var currentRound = 0;
+var currentTurn = 0;
+// get round, turn from db if exist
+const startRound = function() {
+    startTurn = setInterval(function() {
+        currentTurn += 1;
+        console.log('turn : ', turn);
+    }, 5000);
+};
+
+// startTurn = setInterval(function() {
+//     console.log('next turn...');
+// }, 3000);
+
+const stopRound = function() {
+    clearInterval(startTurn);
+    currentTurn = 0;
+    currentRound += 1;
+};
+
+// startRound();
